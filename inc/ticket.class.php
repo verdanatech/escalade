@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Escalade. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2015-2022 by Escalade plugin team.
+ * @copyright Copyright (C) 2015-2023 by Escalade plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/escalade
  * -------------------------------------------------------------------------
@@ -643,9 +643,20 @@ class PluginEscaladeTicket {
          $group_found = $group_ticket->find($group_condition);
          if (empty($group_found)) {
 
-            //add group to ticket
-            $group_ticket->add($group_condition);
+             //add group to ticket
+             $group_ticket->add($group_condition);
+             //remove old group if needed
+            if ($_SESSION['plugins']['escalade']['config']['remove_group']) {
+               if(isset($item->input['_groups_id_assign'])) {
+                  foreach ($item->input['_groups_id_assign'] as $idActor => $actor) {
+                     unset($item->input['_groups_id_assign'][$idActor]);
+                     unset($item->input['_groups_id_assign_notif']['use_notification'][$idActor]);
+                     unset($item->input['_groups_id_assign_notif']['alternative_email'][$idActor]);
+                  }
+               }
+            }
          }
+
       }
 
       //category user
@@ -665,6 +676,16 @@ class PluginEscaladeTicket {
 
             //add user to ticket
             $ticket_user->add($user_condition);
+             //remove old tech if needed
+            if($_SESSION['plugins']['escalade']['config']['remove_tech']) {
+               if(isset($item->input['_users_id_assign'])) {
+                  foreach ($item->input['_users_id_assign'] as $idActor => $actor) {
+                     unset($item->input['_users_id_assign'][$idActor]);
+                     unset($item->input['_users_id_assign_notif']['use_notification'][$idActor]);
+                     unset($item->input['_users_id_assign_notif']['alternative_email'][$idActor]);
+                  }
+                }
+            }
          }
       }
    }

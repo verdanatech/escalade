@@ -22,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Escalade. If not, see <http://www.gnu.org/licenses/>.
  * -------------------------------------------------------------------------
- * @copyright Copyright (C) 2015-2022 by Escalade plugin team.
+ * @copyright Copyright (C) 2015-2023 by Escalade plugin team.
  * @license   GPLv2 https://www.gnu.org/licenses/gpl-2.0.html
  * @link      https://github.com/pluginsGLPI/escalade
  * -------------------------------------------------------------------------
@@ -192,7 +192,7 @@ class PluginEscaladeHistory extends CommonDBTM {
       $is_deleted = " `glpi_tickets`.`is_deleted` = 0 ";
 
       if ($type == "notold") {
-         $title = __("Tickets to follow (climbed)", "escalade");
+         $title = __("Tickets to follow (escalated)", "escalade");
          $status = CommonITILObject::INCOMING.", ".CommonITILObject::PLANNED.", ".
                    CommonITILObject::ASSIGNED.", ".CommonITILObject::WAITING;
 
@@ -206,7 +206,7 @@ class PluginEscaladeHistory extends CommonDBTM {
             ON (`glpi_tickets`.`id` = `glpi_groups_tickets`.`tickets_id`
                AND `glpi_groups_tickets`.`type`=2)";
       } else {
-         $title = __("Tickets to close (climbed)", "escalade");
+         $title = __("Tickets to close (escalated)", "escalade");
          $status = CommonITILObject::SOLVED;
 
          $search_assign = " (`glpi_groups_tickets`.`groups_id` IN ('$groups'))";
