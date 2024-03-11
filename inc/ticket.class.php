@@ -863,11 +863,7 @@ class PluginEscaladeTicket {
             return [];
         }
 
-        if (
-            !Session::haveRight('ticket', Ticket::READALL)
-            || !Session::haveRight('ticket', Ticket::READASSIGN)
-            || !Session::haveRight('ticket', CREATE)
-        ) {
+        if (!$options['item']->canAssign()) {
             return [];
         }
 
@@ -901,6 +897,7 @@ class PluginEscaladeTicket {
                 'class' => 'action-escalation',
                 'icon' => 'ti ti-arrow-up',
                 'label' => __('Escalate', 'escalade'),
+                'short_label' => __('Escalate', 'escalade'),
                 'item' => new self()
             ];
         }
@@ -910,9 +907,10 @@ class PluginEscaladeTicket {
 
     public function showForm($ID, $options = [])
     {
+        $tickets_id = $options["parent"]->getID();
         $groups_assign = new Group_Ticket();
         $groups = $groups_assign->find([
-            'tickets_id' => $options["parent"]->getID(),
+            'tickets_id' => $tickets_id,
             'type' => CommonITILActor::ASSIGN,
         ]);
 
@@ -920,11 +918,22 @@ class PluginEscaladeTicket {
         foreach ($groups as $grp) {
             $assigned_groups[$grp['groups_id']] = $grp['groups_id'];
         }
-
+        $config = new PluginEscaladeConfig();
+        $config->getFromDB(1);
+        $PluginEscaladeGroup_Group = new PluginEscaladeGroup_Group();
+        $groups_id_filtered = array_keys($PluginEscaladeGroup_Group->getGroups($tickets_id));
+        $groups_id_filtered = empty($groups_id_filtered) ? [-1] : $groups_id_filtered;
+        $condition = [
+            'is_assign' => 1
+        ];
+        if ($config->fields['use_filter_assign_group']) {
+            $condition['id'] = $groups_id_filtered;
+        }
         TemplateRenderer::getInstance()->display('@escalade/escalade_form.html.twig', [
             'action'          => PLUGIN_ESCALADE_WEBDIR . '/front/ticket.form.php',
             'ticket'          => $options['parent'],
             'assigned_groups' => $assigned_groups,
+            'condition'     => $condition,
         ]);
     }
 }
